@@ -3,3 +3,4 @@ pyserial_asyncio>=0.4
 async_timeout>=3.0.0
 asyncio_mqtt>=0.12.1
 python_slugify>=6.1.2
+requests>=2.27.1
