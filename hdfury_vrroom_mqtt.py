@@ -6,11 +6,15 @@ import json
 import requests
 from slugify import slugify
 import socket
+import os
 
+BASE_TOPIC = os.environ.get('MQTT_BASE_TOPIC') or 'vrroom'
+MQTT_HOST = os.environ.get('MQTT_HOST')
+VRROOM_IP = os.environ.get('VRROOM_IP')
 
-BASE_TOPIC = 'vrroom'
-MQTT_HOST = '192.168.1.98'
-VRROOM_IP = '192.168.1.31'
+if not MQTT_HOST or not VRROOM_IP:
+    raise Exception('Missing environment config! Please make sure MQTT_HOST and VRROOM_IP environment variables are set.')
+
 VRROOM_TCP_PORT = 2222
 VRROOM_UNIQUE_IDENTIFIER = f'VRROOM_AT_{VRROOM_IP}'
 
@@ -134,7 +138,8 @@ async def publish_homeassistant_discovery_config(client):
                 "name": f"VRROOM {description}", 
                 "unique_id": f"{VRROOM_UNIQUE_IDENTIFIER}_{slugged}",
                 "state_topic": f"{BASE_TOPIC}/state/{slugged}",
-            })
+            }),
+            retain = True
         )
     
     for i in range(0,2):
@@ -145,7 +150,8 @@ async def publish_homeassistant_discovery_config(client):
                 "command_topic": f"{BASE_TOPIC}/command/tx{i}-port-selection", 
                 "state_topic": f"{BASE_TOPIC}/state/tx{i}-port-selection",
                 "options": PORT_OPTIONS,
-            })
+            }),
+            retain = True
         )
         
 
